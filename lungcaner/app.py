@@ -9,8 +9,13 @@ import streamlit as st
 import csv
 
 # Set up Groq API
-client = Groq(api_key="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")
+try:
+    secrets = st.secrets["groq_api_key"]
+except KeyError:
+    st.error("API Key not found in secrets. Please check the Streamlit Secrets configuration.")
 
+# Set up Groq API with the secret key
+client = Groq(api_key=secrets)
 # Load the dataset
 dataset_path = 'https://raw.githubusercontent.com/noumantechie/RagApplication/main/lungcaner/dataseter.csv'  # Ensure this file is uploaded
 df = pd.read_csv(dataset_path)
