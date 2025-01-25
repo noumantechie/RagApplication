@@ -26,7 +26,7 @@ except Exception as e:
     st.stop()
 
 # Check the columns of the dataframe to ensure the correct ones exist
-st.write("Dataset Columns:", df.columns)
+#st.write("Dataset Columns:", df.columns)
 
 # Prepare embeddings (caching embeddings to avoid recomputation)
 model = SentenceTransformer('all-MiniLM-L6-v2')  # Open-source embedding model
