@@ -16,32 +16,19 @@ except KeyError:
 
 # Set up Groq API with the secret key
 client = Groq(api_key=secrets)
-
 # Load the dataset
 dataset_path = 'https://raw.githubusercontent.com/noumantechie/RagApplication/main/lungcaner/dataseter.csv'  # Ensure this file is uploaded
-try:
-    df = pd.read_csv(dataset_path)
-except Exception as e:
-    st.error(f"Error loading dataset: {e}")
-    st.stop()
+df = pd.read_csv(dataset_path)
 
-# Check the columns of the dataframe to ensure the correct ones exist
-#st.write("Dataset Columns:", df.columns)
-
-# Prepare embeddings (caching embeddings to avoid recomputation)
+# Prepare embeddings
 model = SentenceTransformer('all-MiniLM-L6-v2')  # Open-source embedding model
 
-@st.cache_data
-def compute_embeddings(df):
-    # Convert dataset rows to embeddings
-    def row_to_text(row):
-        return " ".join(f"{col}: {val}" for col, val in row.items())
+# Convert dataset rows to embeddings
+def row_to_text(row):
+    return " ".join(f"{col}: {val}" for col, val in row.items())
 
-    df['text'] = df.apply(row_to_text, axis=1)
-    embeddings = np.vstack(df['text'].apply(lambda x: model.encode(x)).to_numpy())
-    return embeddings
-
-embeddings = compute_embeddings(df)
+df['text'] = df.apply(row_to_text, axis=1)
+embeddings = np.vstack(df['text'].apply(lambda x: model.encode(x)).to_numpy())
 
 # Define retrieval function
 def retrieve_relevant_rows(query, top_n=3):
@@ -60,26 +47,19 @@ def rag_pipeline(query):
     input_to_groq = f"Context: {retrieved_text} \nQuestion: {query}"
 
     # Step 3: Use Groq for text generation
-    try:
-        chat_completion = client.chat.completions.create(
-            messages=[{
-                "role": "system",
-                "content": "You are an expert in analyzing medical data related to lung cancer.",
-            },
-            {
-                "role": "user",
-                "content": input_to_groq,
-            }],
-            model="llama3-8b-8192",  # Use Groq's Llama model
-        )
-        response_content = chat_completion.choices[0].message.content
-        if response_content:
-            return response_content
-        else:
-            return "No valid response from the model."
-    except Exception as e:
-        st.error(f"Error in Groq API call: {e}")
-        return "There was an issue processing your request."
+    chat_completion = client.chat.completions.create(
+        messages=[{
+            "role": "system",
+            "content": "You are an expert in analyzing medical data related to lung cancer.",
+        },
+        {
+            "role": "user",
+            "content": input_to_groq,
+        }],
+        model="llama3-8b-8192",  # Use Groq's Llama model
+    )
+    return chat_completion.choices[0].message.content
+
 
 # Streamlit interface
 st.title("Medical Query Answering System")
@@ -90,9 +70,5 @@ query = st.text_input("Your Query", "")
 
 # Handle user input and show results
 if query:
-    if len(query.strip()) > 3:
-        with st.spinner('Generating response...'):
-            response = rag_pipeline(query)
-        st.write("Response:", response)
-    else:
-        st.warning("Please enter a longer query.")
+    response = rag_pipeline(query)
+    st.write("Response:", response)
