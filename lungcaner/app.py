@@ -55,57 +55,87 @@ def rag_pipeline(query):
     )
     return chat_completion.choices[0].message.content
 
-# Streamlit interface enhancements
 
-# Set custom page configuration
+# Set page config
 st.set_page_config(page_title="Medical Query Answering System", layout="centered")
 
-# Add a background color and some padding for the title
+# Add custom CSS styling for professional look
 st.markdown("""
     <style>
         .stApp {
-            background-color: #f0f2f6;
+            background-color: #f0f0f0;
+            font-family: 'Roboto', sans-serif;
         }
         .stTitle {
-            font-size: 32px;
-            font-weight: bold;
             color: #2a3d66;
-            padding-bottom: 20px;
+            font-size: 40px;
+            font-weight: 600;
+            margin-bottom: 20px;
         }
         .stTextInput input {
             font-size: 16px;
-            padding: 10px;
+            padding: 15px;
+            width: 100%;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
         }
         .stButton button {
-            background-color: #4CAF50;
+            background-color: #007BFF;
             color: white;
-            font-size: 16px;
-            padding: 10px 20px;
+            font-size: 18px;
+            padding: 15px 30px;
             border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
         }
         .stButton button:hover {
-            background-color: #45a049;
+            background-color: #0056b3;
+        }
+        .stButton button:active {
+            background-color: #003f7f;
         }
         .stWrite {
             font-size: 18px;
-            font-weight: bold;
+            color: #333;
+            line-height: 1.6;
+        }
+        .stCard {
+            background-color: #ffffff;
+            padding: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+        }
+        .response-container {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
         }
     </style>
 """, unsafe_allow_html=True)
 
-# Title of the app
+# Title of the app with a stylish header
 st.markdown("<h1 class='stTitle'>Medical Query Answering System</h1>", unsafe_allow_html=True)
 
-# Explanation text
-st.write("Enter a query below and get a detailed response based on the dataset.")
+# Add some explanation text
+st.markdown("<p style='font-size:18px; color:#555;'>Enter a medical query below, and get a detailed response based on the dataset.</p>", unsafe_allow_html=True)
 
-# User input query
-query = st.text_input("Your Query", "")
+# Main container for user input and button
+with st.container():
+    st.markdown("<div class='stCard'>", unsafe_allow_html=True)
+    # User input query with a cleaner input field
+    query = st.text_input("Your Query", placeholder="Type your query here...")
+    
+    # Add a styled button
+    if st.button("Get Answer"):
+        if query:
+            response = rag_pipeline(query)
+            st.markdown(f"<div class='response-container'><h4>Response:</h4><p>{response}</p></div>", unsafe_allow_html=True)
+        else:
+            st.warning("Please enter a query to get a response.")
 
-# Add a button to trigger query execution
-if st.button("Get Answer"):
-    if query:
-        response = rag_pipeline(query)
-        st.markdown(f"### Response: \n{response}")
-    else:
-        st.warning("Please enter a query to get a response.")
+    st.markdown("</div>", unsafe_allow_html=True)
