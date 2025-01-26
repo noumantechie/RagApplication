@@ -63,7 +63,7 @@ def rag_pipeline(query):
 
 # Streamlit interface
 st.title("Lung Cancer Predictor App")
-st.write("Enter a query below and get a detailed response based on the dataset.")
+#st.write("Enter a query below and get a detailed response based on the dataset.")
 
 # User input query
 query = st.text_input("Your Query", "")
