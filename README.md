@@ -8,7 +8,7 @@ Retrieval Augmented Generation (RAG) enhances Large Language Models (LLMs) by in
 
 ## RAG Workflow
 
-![RAG Workflow](images/Rag.png "RAG Workflow Diagram")
+![RAG Workflow](images/RagApplication.png "RAG Workflow Diagram")
 
 1. **Input Query**:  
    The user inputs a query.
